@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "./supabaseClient";
 import { BUILDING_TYPES, GRID_SIZE } from "./Game.jsx";
+import { color, font, blockShadow } from "./theme.js";
 
 export default function FriendsPanel({ userId, onClose }) {
   const [tab, setTab] = useState("friends"); // "friends" | "requests" | "search"
@@ -152,7 +153,7 @@ export default function FriendsPanel({ userId, onClose }) {
 
   return (
     <Overlay onClose={onClose}>
-      <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 14 }}>
+      <div style={{ fontFamily: font.display, fontSize: 22, marginBottom: 14 }}>
         Buren
       </div>
 
@@ -283,16 +284,17 @@ function Overlay({ children, onClose }) {
     >
       <div
         style={{
-          background: "#FBF3E1",
+          background: color.parchment,
+          border: `2px solid ${color.gold}`,
           borderRadius: 18,
           padding: "22px 20px",
           width: "100%",
           maxWidth: 420,
           maxHeight: "80vh",
           overflowY: "auto",
-          fontFamily: "'Georgia', 'Iowan Old Style', serif",
-          color: "#3A2E1F",
-          boxShadow: "0 8px 0 rgba(58,46,31,0.25)",
+          fontFamily: font.body,
+          color: color.ink,
+          boxShadow: blockShadow(6),
           position: "relative",
         }}
       >
@@ -341,15 +343,27 @@ function ReadOnlyGrid({ grid }) {
               aspectRatio: "1 / 1",
               borderRadius: 6,
               background: def
-                ? def.color
+                ? def.sprite
+                  ? "#EDE2C2"
+                  : def.color
                 : "repeating-linear-gradient(45deg,#4A7A56,#4A7A56 6px,#446F4F 6px,#446F4F 12px)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               fontSize: 16,
+              overflow: "hidden",
             }}
           >
-            {def ? def.emoji : ""}
+            {def &&
+              (def.sprite ? (
+                <img
+                  src={def.sprite}
+                  alt={def.name}
+                  style={{ width: "82%", height: "82%", objectFit: "contain" }}
+                />
+              ) : (
+                def.emoji
+              ))}
           </div>
         );
       })}

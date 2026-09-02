@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { supabase } from "./supabaseClient";
 import FriendsPanel from "./FriendsPanel.jsx";
+import { color, font, bgWash, blockShadow } from "./theme.js";
 
 // ---- Game data (original content) ----
 export const GRID_SIZE = 7;
@@ -17,6 +18,7 @@ export const BUILDING_TYPES = {
     color: "#C97B4A",
     category: "income",
     unlockLevel: 1,
+    sprite: "/tiles/building-a.png",
   },
   tree: {
     id: "tree",
@@ -53,6 +55,7 @@ export const BUILDING_TYPES = {
     color: "#3C8C7C",
     category: "income",
     unlockLevel: 3,
+    sprite: "/tiles/building-b.png",
   },
   bakery: {
     id: "bakery",
@@ -65,6 +68,7 @@ export const BUILDING_TYPES = {
     color: "#B9772E",
     category: "income",
     unlockLevel: 4,
+    sprite: "/tiles/building-c.png",
   },
   mill: {
     id: "mill",
@@ -77,6 +81,7 @@ export const BUILDING_TYPES = {
     color: "#D4A62A",
     category: "income",
     unlockLevel: 5,
+    sprite: "/tiles/building-d.png",
   },
   clocktower: {
     id: "clocktower",
@@ -89,6 +94,7 @@ export const BUILDING_TYPES = {
     color: "#7A5C8E",
     category: "decor",
     unlockLevel: 6,
+    sprite: "/tiles/building-h.png",
   },
   harbor: {
     id: "harbor",
@@ -101,6 +107,7 @@ export const BUILDING_TYPES = {
     color: "#2E6E8E",
     category: "income",
     unlockLevel: 8,
+    sprite: "/tiles/building-e.png",
   },
   statue: {
     id: "statue",
@@ -113,6 +120,7 @@ export const BUILDING_TYPES = {
     color: "#8C7853",
     category: "decor",
     unlockLevel: 10,
+    sprite: "/tiles/building-i.png",
   },
   bank: {
     id: "bank",
@@ -125,6 +133,7 @@ export const BUILDING_TYPES = {
     color: "#4F7942",
     category: "income",
     unlockLevel: 12,
+    sprite: "/tiles/building-f.png",
   },
   cinema: {
     id: "cinema",
@@ -149,6 +158,7 @@ export const BUILDING_TYPES = {
     color: "#B0563E",
     category: "income",
     unlockLevel: 18,
+    sprite: "/tiles/building-skyscraper-a.png",
   },
   wheel: {
     id: "wheel",
@@ -173,6 +183,7 @@ export const BUILDING_TYPES = {
     color: "#3E7A57",
     category: "income",
     unlockLevel: 28,
+    sprite: "/tiles/building-g.png",
   },
   office: {
     id: "office",
@@ -185,6 +196,7 @@ export const BUILDING_TYPES = {
     color: "#436B8C",
     category: "income",
     unlockLevel: 35,
+    sprite: "/tiles/building-skyscraper-b.png",
   },
   hotel: {
     id: "hotel",
@@ -197,6 +209,7 @@ export const BUILDING_TYPES = {
     color: "#A6484A",
     category: "income",
     unlockLevel: 45,
+    sprite: "/tiles/building-skyscraper-c.png",
   },
   skyscraper: {
     id: "skyscraper",
@@ -209,6 +222,7 @@ export const BUILDING_TYPES = {
     color: "#2E4A6B",
     category: "income",
     unlockLevel: 50,
+    sprite: "/tiles/building-skyscraper-e.png",
   },
   monument: {
     id: "monument",
@@ -221,6 +235,7 @@ export const BUILDING_TYPES = {
     color: "#7A8C5A",
     category: "decor",
     unlockLevel: 65,
+    sprite: "/tiles/building-j.png",
   },
   garden: {
     id: "garden",
@@ -245,6 +260,7 @@ export const BUILDING_TYPES = {
     color: "#8C6B3E",
     category: "decor",
     unlockLevel: 100,
+    sprite: "/tiles/building-k.png",
   },
 };
 
@@ -829,11 +845,11 @@ export default function GoldrushGrove({
   return (
     <div
       style={{
-        fontFamily: "'Georgia', 'Iowan Old Style', serif",
-        background: "linear-gradient(180deg, #FBF3E1 0%, #F3E5C4 100%)",
+        fontFamily: font.body,
+        background: bgWash,
         minHeight: "100%",
-        padding: "20px 16px 32px",
-        color: "#3A2E1F",
+        padding: "20px 16px 40px",
+        color: color.ink,
         position: "relative",
       }}
     >
@@ -856,82 +872,114 @@ export default function GoldrushGrove({
           0%, 100% { opacity: 0.3; transform: scale(0.8); }
           50% { opacity: 1; transform: scale(1.15); }
         }
+        .gg-tile { transition: transform 120ms ease; }
+        .gg-tile:active { transform: scale(0.94); }
       `}</style>
 
-      {/* Header */}
+      {/* Header — styled like a wooden town sign */}
       <div
         style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-end",
           maxWidth: 720,
-          margin: "0 auto 10px",
-          borderBottom: "3px solid #3A2E1F",
-          paddingBottom: 10,
-          gap: 12,
+          margin: "0 auto 18px",
+          border: `3px solid ${color.ink}`,
+          borderRadius: 10,
+          padding: "12px 18px",
+          background: color.parchment,
+          boxShadow: blockShadow(4),
+          position: "relative",
         }}
       >
-        <div>
-          <div style={{ fontSize: 28, fontWeight: 700, letterSpacing: 0.3 }}>
-            Goldrush Grove
-          </div>
-          <div style={{ fontSize: 13, opacity: 0.65, marginTop: 2 }}>
-            {initialProfile?.username || "Speler"} · {totalBuildings} plot
-            {totalBuildings === 1 ? "" : "s"} claimed
-          </div>
-          <div style={{ fontSize: 11, opacity: 0.5, marginTop: 2 }}>
-            {saveStatus === "saving"
-              ? "Opslaan…"
-              : saveStatus === "error"
-              ? "Opslaan mislukt"
-              : "Opgeslagen"}
-            {" · "}
-            <button
-              onClick={onSignOut}
+        <div
+          style={{
+            position: "absolute",
+            inset: 4,
+            border: `1px solid ${color.gold}`,
+            borderRadius: 6,
+            pointerEvents: "none",
+          }}
+        />
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-end",
+            gap: 12,
+            flexWrap: "wrap",
+          }}
+        >
+          <div>
+            <div
               style={{
-                background: "none",
-                border: "none",
-                color: "#B9772E",
-                textDecoration: "underline",
-                cursor: "pointer",
-                fontSize: 11,
-                padding: 0,
-                fontFamily: "inherit",
+                fontFamily: font.display,
+                fontSize: 32,
+                lineHeight: 1,
+                letterSpacing: 0.5,
+                color: color.ink,
               }}
             >
-              Uitloggen
-            </button>
+              Goldrush Grove
+            </div>
+            <div style={{ fontSize: 13, opacity: 0.7, marginTop: 6 }}>
+              {initialProfile?.username || "Speler"} · {totalBuildings} plot
+              {totalBuildings === 1 ? "" : "s"} claimed
+            </div>
+            <div style={{ fontSize: 11, opacity: 0.5, marginTop: 2 }}>
+              {saveStatus === "saving"
+                ? "Opslaan…"
+                : saveStatus === "error"
+                ? "Opslaan mislukt"
+                : "Opgeslagen"}
+              {" · "}
+              <button
+                onClick={onSignOut}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: color.gold,
+                  textDecoration: "underline",
+                  cursor: "pointer",
+                  fontSize: 11,
+                  padding: 0,
+                  fontFamily: "inherit",
+                }}
+              >
+                Uitloggen
+              </button>
+            </div>
           </div>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <button
-            onClick={() => setShowFriends(true)}
-            style={{
-              background: "#FFFDF7",
-              border: "1px solid #E3D5AE",
-              color: "#3A2E1F",
-              borderRadius: 10,
-              padding: "8px 14px",
-              fontSize: 14,
-              fontWeight: 700,
-              cursor: "pointer",
-              fontFamily: "inherit",
-            }}
-          >
-            👥 Buren
-          </button>
-          <div
-            style={{
-              background: "#3A2E1F",
-              color: "#FBF3E1",
-              borderRadius: 10,
-              padding: "8px 16px",
-              fontSize: 20,
-              fontWeight: 700,
-              fontVariantNumeric: "tabular-nums",
-            }}
-          >
-            🪙 {fmt(coins)}
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <button
+              onClick={() => setShowFriends(true)}
+              style={{
+                background: color.paper,
+                border: `1px solid ${color.hairline}`,
+                color: color.ink,
+                borderRadius: 10,
+                padding: "9px 14px",
+                fontSize: 14,
+                fontWeight: 700,
+                cursor: "pointer",
+                fontFamily: "inherit",
+                boxShadow: blockShadow(2),
+              }}
+            >
+              👥 Buren
+            </button>
+            <div
+              style={{
+                background: `linear-gradient(180deg, ${color.goldLight}, ${color.gold})`,
+                color: color.ink,
+                borderRadius: 10,
+                padding: "9px 16px",
+                fontSize: 20,
+                fontWeight: 700,
+                fontVariantNumeric: "tabular-nums",
+                boxShadow: blockShadow(3),
+                border: `1px solid rgba(58,46,31,0.15)`,
+              }}
+            >
+              🪙 {fmt(coins)}
+            </div>
           </div>
         </div>
       </div>
@@ -993,16 +1041,18 @@ export default function GoldrushGrove({
         </div>
       </div>
 
-      {/* Mission tracker */}
+      {/* Mission tracker — a "wanted poster" style card */}
       {activeQuest ? (
         <div
           style={{
             maxWidth: 720,
             margin: "0 auto 16px",
-            background: "#FFFDF7",
-            borderRadius: 12,
-            padding: "10px 14px",
-            boxShadow: "0 1px 0 rgba(58,46,31,0.15)",
+            background: color.parchment,
+            border: `1px solid ${color.hairline}`,
+            borderLeft: `4px solid ${color.slate}`,
+            borderRadius: 10,
+            padding: "12px 16px",
+            boxShadow: blockShadow(3),
           }}
         >
           <div
@@ -1016,15 +1066,15 @@ export default function GoldrushGrove({
             <div>
               <div
                 style={{
-                  fontSize: 11,
+                  fontFamily: font.display,
+                  fontSize: 13,
                   letterSpacing: 0.5,
-                  opacity: 0.55,
-                  fontWeight: 700,
+                  opacity: 0.6,
                 }}
               >
-                MISSION
+                Missie
               </div>
-              <div style={{ fontSize: 15, fontWeight: 700 }}>
+              <div style={{ fontSize: 15.5, fontWeight: 700 }}>
                 {activeQuest.title}
               </div>
               <div style={{ fontSize: 12.5, opacity: 0.75 }}>
@@ -1035,8 +1085,12 @@ export default function GoldrushGrove({
               style={{
                 fontSize: 12.5,
                 fontWeight: 700,
-                color: "#B9772E",
+                color: color.gold,
                 whiteSpace: "nowrap",
+                background: color.paper,
+                border: `1px solid ${color.hairline}`,
+                borderRadius: 999,
+                padding: "3px 9px",
               }}
             >
               +{activeQuest.reward.coins}c
@@ -1046,16 +1100,17 @@ export default function GoldrushGrove({
             style={{
               height: 7,
               borderRadius: 999,
-              background: "#E3D5AE",
+              background: color.paperDeep,
               overflow: "hidden",
               marginTop: 8,
+              border: `1px solid ${color.hairline}`,
             }}
           >
             <div
               style={{
                 height: "100%",
                 width: `${(activeQuestProgress / activeQuest.target) * 100}%`,
-                background: "linear-gradient(90deg, #3C8C7C, #2E6E8E)",
+                background: `linear-gradient(90deg, ${color.pine}, ${color.slate})`,
                 transition: "width 300ms ease",
               }}
             />
@@ -1064,8 +1119,8 @@ export default function GoldrushGrove({
             {activeQuest.target > 1
               ? `${Math.floor(activeQuestProgress)} / ${activeQuest.target}`
               : activeQuestProgress >= 1
-              ? "Complete"
-              : "Not yet"}
+              ? "Voltooid"
+              : "Nog niet"}
           </div>
         </div>
       ) : (
@@ -1087,24 +1142,25 @@ export default function GoldrushGrove({
         style={{
           maxWidth: 720,
           margin: "0 auto 16px",
-          background: "#FFFDF7",
-          borderRadius: 12,
-          padding: "10px 14px",
-          boxShadow: "0 1px 0 rgba(58,46,31,0.15)",
+          background: color.parchment,
+          border: `1px solid ${color.hairline}`,
+          borderLeft: `4px solid ${color.gold}`,
+          borderRadius: 10,
+          padding: "12px 16px",
+          boxShadow: blockShadow(3),
         }}
       >
         <div
           style={{
-            fontSize: 11,
-            letterSpacing: 0.5,
-            opacity: 0.55,
-            fontWeight: 700,
-            marginBottom: 6,
+            fontFamily: font.display,
+            fontSize: 13,
+            opacity: 0.6,
+            marginBottom: 8,
           }}
         >
-          DAILY TASKS
+          Dagelijkse taken
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {dailySlots.map((slot, i) => {
             const template = DAILY_POOL[slot.templateIdx];
             const done = Math.max(
@@ -1126,7 +1182,7 @@ export default function GoldrushGrove({
                   <span>
                     <strong>{template.title}</strong> — {template.desc}
                   </span>
-                  <span style={{ color: "#B9772E", fontWeight: 700 }}>
+                  <span style={{ color: color.gold, fontWeight: 700 }}>
                     +{template.reward.coins}c
                   </span>
                 </div>
@@ -1134,9 +1190,10 @@ export default function GoldrushGrove({
                   style={{
                     height: 5,
                     borderRadius: 999,
-                    background: "#E3D5AE",
+                    background: color.paperDeep,
                     overflow: "hidden",
                     marginTop: 3,
+                    border: `1px solid ${color.hairline}`,
                   }}
                 >
                   <div
@@ -1154,50 +1211,99 @@ export default function GoldrushGrove({
         </div>
       </div>
 
-      {/* Palette */}
+      {/* Palette — horizontal scrolling strip of building "cards" */}
       <div
         style={{
-          display: "flex",
-          gap: 8,
           maxWidth: 720,
           margin: "0 auto 16px",
-          flexWrap: "wrap",
+          overflowX: "auto",
+          paddingBottom: 4,
         }}
       >
-        {PALETTE_ORDER.map((key) => {
-          const def = BUILDING_TYPES[key];
-          const active = selected === key;
-          const locked = def.unlockLevel > progress.level;
-          const affordable = coins >= def.cost;
-          return (
-            <button
-              key={key}
-              onClick={() => setSelected(key)}
-              style={{
-                cursor: "pointer",
-                border: active ? "2px solid #3A2E1F" : "2px solid transparent",
-                background: active ? "#F3E5C4" : "#FFFDF7",
-                borderRadius: 12,
-                padding: "8px 12px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                minWidth: 84,
-                opacity: locked ? 0.45 : affordable ? 1 : 0.6,
-                boxShadow: "0 1px 0 rgba(58,46,31,0.15)",
-                position: "relative",
-              }}
-            >
-              <span style={{ fontSize: 22 }}>{locked ? "🔒" : def.emoji}</span>
-              <span style={{ fontSize: 12, fontWeight: 600, marginTop: 2 }}>
-                {def.name}
-              </span>
-              <span style={{ fontSize: 11, opacity: 0.7 }}>
-                {locked ? `Lvl ${def.unlockLevel}` : `${def.cost}c`}
-              </span>
-            </button>
-          );
-        })}
+        <div style={{ display: "flex", gap: 8, width: "max-content" }}>
+          {PALETTE_ORDER.map((key) => {
+            const def = BUILDING_TYPES[key];
+            const active = selected === key;
+            const locked = def.unlockLevel > progress.level;
+            const affordable = coins >= def.cost;
+            return (
+              <button
+                key={key}
+                onClick={() => setSelected(key)}
+                className="gg-tile"
+                style={{
+                  cursor: "pointer",
+                  border: active
+                    ? `2px solid ${color.ink}`
+                    : `2px solid transparent`,
+                  background: active ? color.paperDeep : color.parchment,
+                  borderRadius: 12,
+                  padding: "8px 10px",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  width: 86,
+                  opacity: locked ? 0.5 : 1,
+                  boxShadow: blockShadow(active ? 1 : 3),
+                  position: "relative",
+                  flexShrink: 0,
+                }}
+              >
+                <div
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: 10,
+                    background: locked
+                      ? "#C9BFA3"
+                      : def.sprite
+                      ? "#EDE2C2"
+                      : `linear-gradient(160deg, ${def.color}, ${def.color}CC)`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 20,
+                    boxShadow: "inset 0 -3px 0 rgba(0,0,0,0.18)",
+                    marginBottom: 4,
+                    overflow: "hidden",
+                  }}
+                >
+                  {locked ? (
+                    "🔒"
+                  ) : def.sprite ? (
+                    <img
+                      src={def.sprite}
+                      alt={def.name}
+                      style={{ width: "80%", height: "80%", objectFit: "contain" }}
+                    />
+                  ) : (
+                    def.emoji
+                  )}
+                </div>
+                <span
+                  style={{
+                    fontSize: 11.5,
+                    fontWeight: 700,
+                    textAlign: "center",
+                    lineHeight: 1.15,
+                  }}
+                >
+                  {def.name}
+                </span>
+                <span
+                  style={{
+                    fontSize: 10.5,
+                    opacity: locked ? 0.8 : affordable ? 0.65 : 0.9,
+                    color: !locked && !affordable ? color.brick : "inherit",
+                    marginTop: 1,
+                  }}
+                >
+                  {locked ? `Lvl ${def.unlockLevel}` : `${def.cost}c`}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Grid */}
@@ -1208,10 +1314,10 @@ export default function GoldrushGrove({
           display: "grid",
           gridTemplateColumns: `repeat(${GRID_SIZE}, 1fr)`,
           gap: 5,
-          background: "#3F6B4A",
+          background: `linear-gradient(160deg, ${color.pine}, #35573F)`,
           padding: 8,
           borderRadius: 14,
-          boxShadow: "0 6px 0 rgba(58,46,31,0.25)",
+          boxShadow: blockShadow(6),
         }}
       >
         {grid.map((cell, idx) => {
@@ -1232,15 +1338,21 @@ export default function GoldrushGrove({
               key={idx}
               onClick={() => (cell ? collect(idx) : placeBuilding(idx))}
               title={def ? def.name : "Empty plot"}
+              className="gg-tile"
               style={{
                 position: "relative",
                 aspectRatio: "1 / 1",
-                borderRadius: 8,
-                border: "none",
+                borderRadius: 7,
+                border: cell ? "1px solid rgba(0,0,0,0.15)" : "none",
                 cursor: "pointer",
                 background: cell
-                  ? def.color
-                  : "repeating-linear-gradient(45deg,#4A7A56,#4A7A56 6px,#446F4F 6px,#446F4F 12px)",
+                  ? def.sprite
+                    ? "#EDE2C2"
+                    : `linear-gradient(160deg, ${def.color}, ${def.color}CC)`
+                  : "repeating-linear-gradient(45deg,#4A7A56,#4A7A56 6px,#3D6647 6px,#3D6647 12px)",
+                boxShadow: cell
+                  ? "inset 0 -4px 0 rgba(0,0,0,0.2), inset 0 2px 0 rgba(255,255,255,0.25)"
+                  : "inset 0 0 0 1px rgba(0,0,0,0.1)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -1248,7 +1360,19 @@ export default function GoldrushGrove({
                 overflow: "hidden",
               }}
             >
-              {cell && (
+              {cell && def.sprite && (
+                <img
+                  src={def.sprite}
+                  alt={def.name}
+                  style={{
+                    width: "82%",
+                    height: "82%",
+                    objectFit: "contain",
+                    opacity: constructing ? 0.45 : 1,
+                  }}
+                />
+              )}
+              {cell && !def.sprite && (
                 <span style={{ opacity: constructing ? 0.4 : 1 }}>
                   {def.emoji}
                 </span>
@@ -1367,13 +1491,14 @@ export default function GoldrushGrove({
         >
           <div
             style={{
-              background: "#FBF3E1",
+              background: color.parchment,
+              border: `2px solid ${color.gold}`,
               borderRadius: 20,
               padding: "28px 24px",
               width: "100%",
               maxWidth: 320,
               textAlign: "center",
-              boxShadow: "0 10px 0 rgba(58,46,31,0.3)",
+              boxShadow: blockShadow(6),
               animation: "popIn 260ms ease",
             }}
           >
@@ -1382,12 +1507,18 @@ export default function GoldrushGrove({
                 fontSize: 13,
                 letterSpacing: 1,
                 fontWeight: 700,
-                color: "#B9772E",
+                color: color.gold,
               }}
             >
               LEVEL {activeReward.level}
             </div>
-            <div style={{ fontSize: 20, fontWeight: 700, margin: "4px 0 18px" }}>
+            <div
+              style={{
+                fontFamily: font.display,
+                fontSize: 26,
+                margin: "4px 0 18px",
+              }}
+            >
               You leveled up!
             </div>
 
