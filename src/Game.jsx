@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { supabase } from "./supabaseClient";
+import FriendsPanel from "./FriendsPanel.jsx";
 
 // ---- Game data (original content) ----
-const GRID_SIZE = 7;
+export const GRID_SIZE = 7;
 
-const BUILDING_TYPES = {
+export const BUILDING_TYPES = {
   house: {
     id: "house",
     name: "Cottage",
@@ -608,6 +609,7 @@ export default function GoldrushGrove({
   );
 
   const [saveStatus, setSaveStatus] = useState("saved"); // "saved" | "saving" | "error"
+  const [showFriends, setShowFriends] = useState(false);
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 250);
@@ -901,20 +903,42 @@ export default function GoldrushGrove({
             </button>
           </div>
         </div>
-        <div
-          style={{
-            background: "#3A2E1F",
-            color: "#FBF3E1",
-            borderRadius: 10,
-            padding: "8px 16px",
-            fontSize: 20,
-            fontWeight: 700,
-            fontVariantNumeric: "tabular-nums",
-          }}
-        >
-          🪙 {fmt(coins)}
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <button
+            onClick={() => setShowFriends(true)}
+            style={{
+              background: "#FFFDF7",
+              border: "1px solid #E3D5AE",
+              color: "#3A2E1F",
+              borderRadius: 10,
+              padding: "8px 14px",
+              fontSize: 14,
+              fontWeight: 700,
+              cursor: "pointer",
+              fontFamily: "inherit",
+            }}
+          >
+            👥 Buren
+          </button>
+          <div
+            style={{
+              background: "#3A2E1F",
+              color: "#FBF3E1",
+              borderRadius: 10,
+              padding: "8px 16px",
+              fontSize: 20,
+              fontWeight: 700,
+              fontVariantNumeric: "tabular-nums",
+            }}
+          >
+            🪙 {fmt(coins)}
+          </div>
         </div>
       </div>
+
+      {showFriends && (
+        <FriendsPanel userId={userId} onClose={() => setShowFriends(false)} />
+      )}
 
       {/* XP bar */}
       <div style={{ maxWidth: 720, margin: "0 auto 16px" }}>
